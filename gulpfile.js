@@ -26,3 +26,18 @@ gulp.task('start-2', gulp.series(['task-before-1', 'task-before-2'], function (d
   console.log("Start 2");
   done();
 }))
+
+// Урок 4: Обновление проекта с browsersync
+var browserSync = require('browser-sync').create();
+gulp.task('server', function (done) {
+  browserSync.init({
+    server: { baseDir: './src/' }
+  });
+
+  gulp.watch('src/**/*.html').on('change', browserSync.reload);
+  gulp.watch('src/css/**/*.css').on('change', browserSync.reload);
+  gulp.watch('src/js/**/*.js').on('change', browserSync.reload);
+  done();
+});
+
+gulp.task('default', gulp.series(['server']));
