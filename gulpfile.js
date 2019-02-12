@@ -41,3 +41,17 @@ gulp.task('server', function (done) {
 });
 
 gulp.task('default', gulp.series(['server']));
+
+// Урок 6: Task для компиляции Less
+var less = require('gulp-less');
+
+gulp.task('less', function() {
+  return new Promise(function (resolve, reject) {
+    return gulp.src('./src/less/main.less')
+      .pipe(less())
+      .pipe(gulp.dest('./src/css/'))
+      .on('end', () => {
+        resolve();
+      });
+  });
+});
