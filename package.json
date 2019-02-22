@@ -18,6 +18,7 @@
     "node-sass": "^4.11.0"
   },
   "dependencies": {
-    "gulp-less": "^4.0.1"
+    "gulp-less": "^4.0.1",
+    "gulp-sourcemaps": "^2.6.5"
   }
 }

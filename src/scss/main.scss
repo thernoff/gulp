@@ -1,3 +1,4 @@
+$color: rgb(127, 30, 172);
 $bgColor: #5b8deb;
 $fontSize: 1.4em;
 body {
@@ -8,3 +9,6 @@ body {
     transition: all 0.2s ease-in;
   }
   
+.header {
+    color: $color;
+}

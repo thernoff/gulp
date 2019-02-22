@@ -8,6 +8,7 @@ var plumber = require('gulp-plumber');
 var notify = require('gulp-notify');
 var autoprefixer = require('gulp-autoprefixer');
 var scss = require('gulp-sass');
+var sourcemaps = require('gulp-sourcemaps');
 
 // ********** Создаем тестовые задачи **********
 gulp.task('task-before-1', function () {
@@ -67,6 +68,9 @@ gulp.task('less', function(done) {
           } )
         })
       )
+      .pipe(
+        sourcemaps.init()
+      )
       // Преобразование less в css
       .pipe(less())
       // Расстановка автопрефиксов
@@ -75,7 +79,8 @@ gulp.task('less', function(done) {
           browsers: ['last 6 versions'], // указываем количество последних браузеров, для которых нужно раставлять автопрефиксы
           cascade: false
         })
-      )      
+      )
+      .pipe(sourcemaps.write())
       .pipe(gulp.dest('./src/css/'))
       // метод stream точечно обновляет только одни стили, а reload обновляет всю страницу
       .pipe(browserSync.stream())
@@ -96,6 +101,9 @@ gulp.task('scss', function(done) {
         })
       })
     )
+    .pipe(
+      sourcemaps.init()
+    )
     .pipe(scss())
     .pipe(
       autoprefixer({
@@ -103,20 +111,21 @@ gulp.task('scss', function(done) {
         cascade: false
       })
     )
+    .pipe(sourcemaps.write())
     .pipe(gulp.dest('./src/css/'))
     .pipe(browserSync.stream())
     .on('end', done);
 })
 
 // Создаем задачу
-gulp.task('server', gulp.series(['scss'], function (done) {
+gulp.task('server', gulp.series(['less'], function (done) {
   browserSync.init({
     server: { baseDir: './src/' }
   });
 
   gulp.watch('src/**/*.html').on('change', browserSync.reload);
-  //gulp.watch('src/less/**/*.less', gulp.series(['less']));
-  gulp.watch('src/scss/**/*.scss', gulp.series(['scss']));
+  gulp.watch('src/less/**/*.less', gulp.series(['less']));
+  //gulp.watch('src/scss/**/*.scss', gulp.series(['scss']));
   gulp.watch('src/js/**/*.js').on('change', browserSync.reload);
   done();
 }));
