@@ -1,0 +1,10 @@
+$bgColor: #5b8deb;
+$fontSize: 1.4em;
+body {
+    display: flex;
+    font-size: $fontSize;
+    font-family: Sans-serif;
+    background-color: $bgColor;
+    transition: all 0.2s ease-in;
+  }
+  

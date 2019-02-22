@@ -2,9 +2,12 @@
 var gulp = require('gulp');
 var browserSync = require('browser-sync').create();
 var less = require('gulp-less');
+// Предотвратите разрыв трубы, вызванный ошибками от плагинов gulp
 var plumber = require('gulp-plumber');
+// Отправляет сообщения в Mac Notification Center, Linux notifications (используя notify-send) или Windows >= 8 (using native toaster) 
 var notify = require('gulp-notify');
 var autoprefixer = require('gulp-autoprefixer');
+var scss = require('gulp-sass');
 
 // ********** Создаем тестовые задачи **********
 gulp.task('task-before-1', function () {
@@ -35,7 +38,7 @@ gulp.task('start-2', gulp.series(['task-before-1', 'task-before-2'], function (d
 
 // ********** Создаем задачи **********
 
-// Task для компиляции Less (1 способ)
+// Таск для компиляции Less (1 способ)
 
 /* gulp.task('less', function() {
   return new Promise(function (resolve, reject) {
@@ -48,11 +51,13 @@ gulp.task('start-2', gulp.series(['task-before-1', 'task-before-2'], function (d
   });
 }); */
 
-// Task для компиляции Less (2 способ)
+// Таск для компиляции Less (2 способ)
 gulp.task('less', function(done) {
     return gulp.src('./src/less/main.less')
       // Обработка ошибок: перед тем как начать обработку, сначала запустим plumber
       .pipe(
+        // plumber будет обрабатывать ошибки и выводить их в консоль, 
+        // причем в errorHandler вызываем notify.onError(), что по сути аналогично записи notify('message') - вывод сообщения в трей системы
         plumber({
           errorHandler: notify.onError( (err) => {
             return {
@@ -78,14 +83,40 @@ gulp.task('less', function(done) {
 
 });
 
+/* Таск для компиляции Scss */
+gulp.task('scss', function(done) {
+  return gulp.src('./src/scss/main.scss')
+    .pipe(
+      plumber({
+        errorHandler: notify.onError( (err) => {
+          return {
+            title: 'Compile Scss',
+            message: err.message
+          }
+        })
+      })
+    )
+    .pipe(scss())
+    .pipe(
+      autoprefixer({
+        browsers: ['last 6 versions'],
+        cascade: false
+      })
+    )
+    .pipe(gulp.dest('./src/css/'))
+    .pipe(browserSync.stream())
+    .on('end', done);
+})
+
 // Создаем задачу
-gulp.task('server', gulp.series(['less'], function (done) {
+gulp.task('server', gulp.series(['scss'], function (done) {
   browserSync.init({
     server: { baseDir: './src/' }
   });
 
   gulp.watch('src/**/*.html').on('change', browserSync.reload);
-  gulp.watch('src/less/**/*.less', gulp.series(['less']));
+  //gulp.watch('src/less/**/*.less', gulp.series(['less']));
+  gulp.watch('src/scss/**/*.scss', gulp.series(['scss']));
   gulp.watch('src/js/**/*.js').on('change', browserSync.reload);
   done();
 }));
